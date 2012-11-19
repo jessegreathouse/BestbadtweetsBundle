@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+    
+    <route id="login" pattern="/login" >
+        <default key="_controller">BestbadtweetsBundle:Default:index</default>
+    </route>
+    
+    <route id="_secured" pattern="/secured/">
+        <default key="_controller">BestbadtweetsBundle:Default:index</default>
+    </route>
+    
+    <route id="login_check" pattern="/login_check" />
+    
+    <route id="logout" pattern="/logout" />
+
+    <route id="_homepage" pattern="/">
+        <default key="_controller">BestbadtweetsBundle:Default:index</default>
+    </route>
+
+    <route id="about" pattern="/about">
+        <default key="_controller">BestbadtweetsBundle:Default:about</default>
+    </route>
+
+    <route id="help" pattern="/help">
+        <default key="_controller">BestbadtweetsBundle:Default:help</default>
+    </route>
+
+    <route id="privacy" pattern="/privacy">
+        <default key="_controller">BestbadtweetsBundle:Default:privacy</default>
+    </route>
+
+    <route id="tweet" pattern="/tweet">
+        <default key="_controller">BestbadtweetsBundle:Tweet:index</default>
+    </route>
+    
+    <route id="comments" pattern="/comments">
+        <default key="_controller">BestbadtweetsBundle:Comment:index</default>
+    </route>
+    
+    <route id="comments_recent" pattern="/comments/recent.{_format}">
+        <default key="_controller">BestbadtweetsBundle:Comment:recent</default>
+        <default key="_format">json</default>
+    </route>
+    
+    <route id="like" pattern="comments/like.{_format}">
+        <default key="_controller">BestbadtweetsBundle:Comment:like</default>
+        <default key="_format">json</default>
+    </route>
+    
+    <route id="user" pattern="/user">
+        <default key="_controller">BestbadtweetsBundle:User:index</default>
+    </route>
+
+    <route id="vote" pattern="/vote.{_format}">
+        <default key="_controller">BestbadtweetsBundle:Tweet:vote</default>
+        <default key="_format">json</default>
+    </route>
+
+    <route id="top" pattern="/top">
+        <default key="_controller">BestbadtweetsBundle:Top:index</default>
+    </route>
+    
+    <route id="search" pattern="/search">
+        <default key="_controller">BestbadtweetsBundle:Search:index</default>
+    </route>
+
+    <route id="approve" pattern="/secured/approve.{_format}">
+        <default key="_controller">BestbadtweetsBundle:Suggestion:approve</default>
+        <default key="_format">json</default>
+    </route>
+
+    <route id="top_avg" pattern="/top/avg/{span}">
+        <default key="_controller">BestbadtweetsBundle:Top:avg</default>
+        <default key="span">all</default>
+    </route>
+    
+    <route id="top_score" pattern="/top/score/{span}.{_format}">
+        <default key="_controller">BestbadtweetsBundle:Top:score</default>
+        <default key="_format">html</default>
+        <default key="span">all</default>
+    </route>
+    
+    <route id="latest" pattern="/latest.{_format}">
+        <default key="_controller">BestbadtweetsBundle:Latest:index</default>
+        <default key="_format">html</default>
+    </route>
+    
+    <route id="suggestions" pattern="/suggestions.{_format}">
+        <default key="_controller">BestbadtweetsBundle:Suggestion:index</default>
+        <default key="_format">html</default>
+    </route>
+    
+    <route id="tweeters" pattern="/tweeters">
+        <default key="_controller">BestbadtweetsBundle:Tweeter:index</default>
+    </route>
+    
+    <route id="tweeters_latest" pattern="/tweeters/latest/{span}">
+        <default key="_controller">BestbadtweetsBundle:Tweeter:latest</default>
+        <default key="span">all</default>
+    </route>
+    
+    <route id="tweeters_avg" pattern="/tweeters/avg/{span}">
+        <default key="_controller">BestbadtweetsBundle:Tweeter:avg</default>
+        <default key="span">all</default>
+    </route>
+    
+    <route id="tweeters_score" pattern="/tweeters/score/{span}">
+        <default key="_controller">BestbadtweetsBundle:Tweeter:score</default>
+        <default key="span">all</default>
+    </route>
+    
+    <route id="dashboard_system_message" pattern="/dashboard/systemmessage.{_format}">
+        <default key="_controller">BestbadtweetsBundle:Dashboard:systemMessage</default>
+        <default key="_format">json</default>
+    </route>
+</routes>

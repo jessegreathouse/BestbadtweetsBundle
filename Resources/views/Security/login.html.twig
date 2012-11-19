@@ -1,0 +1,25 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:Default:container.html.twig' %}
+{% block title %}bestbadtweets.com | The Best of the worst Tweets on Twitter{% endblock%}
+{% block content %}
+
+        {% if error %}
+            <div class="error drop-shadow">{{ error.message }}</div>
+        {% endif %}
+
+            <form action="{{ path('admin.login_check') }}" method="post">
+                <div>
+                    <div><label for="username">E-mail Address</label></div>
+                    <div"><input type="text" id="username" name="_username" value="{{ last_username }}" class="text" /></div>
+                </div>
+
+                <div">
+                    <div"><label for="password">Password</label></div>
+                    <div"><input type="password" id="password" name="_password" class="text" /></div>
+                </div>
+
+                <div>
+                    <button type="submit" class="right awesome large blue" value="Login &raquo;">Login &raquo;</button>
+                </div>
+            </form>
+    </div>
+{% endblock content %}

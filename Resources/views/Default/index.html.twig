@@ -1,0 +1,125 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:Default:menu.html.twig' %}
+{% if tweets is not empty %}
+    {% set search_title = tweets[0].text %}
+{% else %}
+    {% set search_title = 'No Tweet results for this search.' %}
+{% endif %}
+{% block title %} bestbadtweets | {{ search_title }} {% endblock title %}
+{% block content %}
+{% if not app.request.isXmlHttpRequest() %}
+<div>
+    <div class="stream-title"></div>
+    <div class="stream-container">
+        <div class="stream">
+            <div class="stream-items">
+{% endif %}
+            {% if tweets is not empty %} 
+                {% for tweet in tweets %}
+                    <div data-item-type="tweet" data-item-id="{{ tweet.id_str }}" class="stream-item" media="true">
+                        <div data-tweet-id="{{ tweet.id_str }}" class="more">»</div>
+                        <div data-user-id="{{ tweet.user.id_str }}" data-screen-name="{{ tweet.user.screen_name }}" data-item-id="{{ tweet.id_str }}" data-tweet-id="{{ tweet.id_str }}" class="stream-item-content tweet stream-tweet  ">
+                            <div class="tweet-dogear "></div>
+                            <div class="tweet-image">
+                                <img width="48" height="48" data-user-id="{{ tweet.user.id_str }}" class="user-profile-link" alt="{{ tweet.user.name }}" src="{{ tweet.user.profile_image_url }}">
+                            </div>
+                            <div class="tweet-content">
+                                <div class="tweet-row">
+                                    <span class="tweet-user-name">
+                                        <a title="{{ tweet.user.name }}" href="/user?id_str={{ tweet.user.id_str }}" data-user-id="{{ tweet.user.id_str }}" class="tweet-screen-name user-profile-link">{{ tweet.user.screen_name }}</a>
+                                        <span class="tweet-full-name">{{ tweet.user.name }}</span>
+                                    </span>
+                                    <div class="tweet-corner">
+                                        <div class="tweet-meta">
+                                            <span class="icons">
+                                                <!--
+                                                <div class="extra-icons">
+                                                    <span class="inlinemedia-icons">
+                                                        <span data-media-type="youtube" data-media-class="video" class="media video"></span>
+                                                    </span>
+                                                </div>
+                                                -->
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tweet-row">
+                                    <div class="tweet-text">{{ tweet.text }}</div>
+                                </div>
+                                <div class="tweet-row">
+                                    <a title="{{ tweet.created_at }}" class="tweet-timestamp" href="/#!/{{ tweet.user.screen_name }}/status/{{ tweet.id_str }}">
+                                        <span data-long-form="true" data-time="{{ tweet.id_str }}" class="_old-timestamp">
+                                            <abbr class="timeago" title="{{ tweet.created_at|date("c") }}" ></abbr>
+                                        </span>
+                                    </a>
+                                  <span data-tweet-id="{{ tweet.id_str }}" class="tweet-actions"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% if not app.request.isXmlHttpRequest() %}
+                    <div class="stream-end">
+                        <img src="/bundles/bestbadtweets/img/tiny-timeline-bird.png" class="stream-end-bird">
+                        No Tweet results for this search.
+                    </div>
+                {% endif %}
+            {% endif %}
+{% if not app.request.isXmlHttpRequest() %}
+            </div>
+            <div class="component">
+                <div class="stream-end"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function initBinds() {
+        query = getParameterByName('q');
+        $('.tweet-text').not('.pretty-link').each(function(i, item) { 
+            $(item).html(replaceURLWithHTMLLinks($(item).html()));
+            $(item).html(addLinkToHash($(item).html()));
+            $(item).html(addLinkToAmp($(item).html()));
+            if (query != "") {
+                $(item).html(searchTextBold($(item).html(), query));
+            }
+            $(item).addClass('pretty-link');
+        });
+    }
+    
+    function fetchMoreTweets()
+    {
+        $('.stream-end').html('<img class="tweet-spinner" src="/bundles/bestbadtweets/img/loader.gif" />');
+
+        var offset = ($('.stream-item').length + 1);
+        $.ajax({
+          url: window.location.pathname + "?offset=" + offset,
+          success: function(data){
+            if ($.trim(data) != "") {
+                $(".stream-items .stream-item:last").after(data);
+                $('.stream-end').empty();        
+            } else {
+               $('.stream-end').html('<img src="/bundles/bestbadtweets/img/tiny-timeline-bird.png" class="stream-end-bird" /><a href="#" class="back-to-top">Back to top ↑</a>');
+            }
+            initBinds();
+          }
+        });
+    };
+
+    jQuery(document).ready(function(){
+        initBinds();
+    
+        $(window).scroll(function(){
+            if  ($(window).scrollTop() == $(document).height() - $(window).height()){
+                fetchMoreTweets();
+            }
+        });
+        $('.back-to-top').live('click', function() {
+            $(window).scrollTop(0);
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

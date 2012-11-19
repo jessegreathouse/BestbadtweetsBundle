@@ -1,0 +1,50 @@
+{% if images is defined %}
+    {% block twitterImages %}
+    
+    {% macro twitterImage(item) %}
+                                        <a href="/#!/{{ user.screen_name }}/media/slideshow?url={{ item.url }}" data-url="{{ item.url }}" class="media-thumbnail thumbnail-image-wrapper" style="width:48px; height:48px; line-height:48pxpx;">
+                                            <div class="thumbnail-wrapper" data-url="{{ item.url }}">
+                                                <img class="scaled-image" src="{{ item.url }}:twthumb" origheight="75" origwidth="100" style="width: 64px; height: 48px; top: 0px; left: -8px; opacity: 1; -webkit-transition-property: none; ">
+                                            </div>
+                                            <div class="thumbnail-active-border">
+                                                <div class="thumbnail-active-border-inner"></div>
+                                            </div>
+                                            <div class="media-play-button"></div>
+                                        </a>
+    {% endmacro %}
+    
+    
+            <div class="component">
+                <div class="component">
+                    <div class="facets-inner">
+                        <h2>Recent Images
+                            <span class="view-all-link"> · 
+                                <a class="view-all" href="/#!/{{ user.screen_name }}/media/grid">view all</a>
+                            </span>
+                        </h2>
+                        <div class="component">
+                            <div class="thumbnail-viewer">
+                                <a href="#">
+                                    <div class="thumbnail-viewer-nav thumbnail-viewer-prev disabled" style="opacity: 0; -webkit-transition-property: none; ">
+                                        <span class="thumbnail-viewer-button thumbnail-viewer-back-button"></span>
+                                    </div>
+                                </a>
+                                <div class="thumbnail-viewer-container" style="">
+                                    <div class="thumbnail-viewer-images" style="width: 4550px; left: 0px; -webkit-transition-property: none; ">
+                                        {% for item in images %}
+                                            {{ _self.twitterImage(item) }}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <div class="thumbnail-viewer-nav thumbnail-viewer-next" style="opacity: 0; -webkit-transition-property: none; ">
+                                        <span class="thumbnail-viewer-button thumbnail-viewer-next-button"></span>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    {% endblock %}
+{% endif %}

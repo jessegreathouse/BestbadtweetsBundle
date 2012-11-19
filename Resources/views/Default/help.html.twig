@@ -1,0 +1,85 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:Tweet:layout.html.twig' %}
+{% block title %}bestbadtweets.com | Help {% endblock%}
+{% block details %}
+{% include "BestbadtweetsBundle:Tweet:media.html.twig" %}
+{% if app.request.isXmlHttpRequest() %}
+<div class="inner-pane active">
+  <div class="pane-toolbar pane-built-in">
+    <a href="#" class="pane-close toolbar-control">close <span>×</span></a>
+    <br style="clear: both;">
+  </div>
+  <div class="pane-components" style="height: 481px; " >
+    <div class="pane-components-inner tweet-components">
+{% endif %}
+        <div class="component">
+            <div id="help" class="static-page">
+                <h1> Help </h1>
+                <h2> Table of contents </h2>
+                <ul>
+                    <li><a title="How can I sign in?" href="#signin" >How can I sign in?</a></li>
+                    <li><a title="Do I need a Twitter account to Participate?" href="#twitteraccount" >Do I need a Twitter account to Participate?</a></li>
+                    <li><a title="How can I suggest / nominate a Tweet?" href="#suggesttweet" >How can I suggest / nominate a Tweet?</a></li>
+                    <li><a title="I suggested a tweet but I dont see it, why not?" href="#seesuggest" >I suggested a tweet but I dont see it, why not?</a></li>
+                    <li><a title="How can I vote for a Tweet?" href="#votetweet" >How can I vote for a Tweet?</a></li>
+                    <li><a title="Why cant I sign in with a different account?" href="#signinalt" >Why cant I sign in with a different account?</a></li>
+                    <li><a title="How can I contact someone for help?" href="#sitecontact" >How can I contact someone for help?</a></li>
+                </ul>
+                <a name="signin" ></a>
+                <h2> How can I sign in? </h2>
+                <p>On the upper right corner of the top menu, click on the space that says "Sign In". This will bring you to Twitter where you may log in. Once you log in twitter, you will be returned to the website with your twitter account signed in. If you still appear to not be signed in, try to click it again. If it still doesn't work, contact a site administrator at <a title="sight administrator" href="mailto:webmaster@bestbadtweets.com" >webmaster@bestbadtweets.com</a></p>
+                <a name="twitteraccount" ></a>
+                <h2> Do I need a Twitter account to Participate? </h2>
+                <p> Yes. This site does not have independant user accounts. It only uses Twitter Id's to identify users. This website uses <a title="Twitter OAuth 1.0a" href="https://dev.twitter.com/docs/auth/oauth/faq" >Twitter OAuth 1.0a</a> to identify users. This is a legitimate and secure way to authenticate through Twitter without divulging any sensitive information to anyone else. Bestbadtweets  uses the Twitter token and by getting permission from you and Twitter we are allowed to use this token until you or twitter destroys the token. You can destroy the token by logging out of the Twitter website. The website nor anyone on the website will ever see or have access to your email address, your password or your personal information except what is on your Twitter profile.</p>
+                <a name="suggesttweet" ></a>
+                <h2> How can I suggest / nominate a Tweet? </h2>
+                <img alt="suggest a bad tweet" src="/bundles/bestbadtweets/img/help/bestbadtweets_suggestion.png" />
+                <p> When you find a bad tweet which you think we should put on our site, let us know by suggesting it to us. To do this is very simple: Go to the tweet on Twitter, Reply to the tweet with any response or no response, and simply add @bestbadtweets to the reply. If you mention @bestbadtweets in reply to any tweet, our software will find it and if it is a good bad tweet our webmasters will add it to our site, and credit you for suggesting it to us.</p>
+                <a name="seesuggest" ></a>
+                <h2>I suggested a tweet but I dont see it, why not?</h2>
+                <p>
+                Our webmasters are few and we work as hard as we can to approve tweet suggestions as fast as possible. Not every tweet will be approved but if the tweet gave you a chuckle, chances are that we will approve it as fast as we can.
+                </p>
+                <a name="votetweet" ></a>
+                <h2>How can I vote for a Tweet?</h2>
+                <img alt="Vote for a Tweet" src="/bundles/bestbadtweets/img/help/bestbadtweets_vote.png" />
+                <p> Below all tweet contents is a graphic of 5 stars. Tweets on bestbadtweets.com are ranked on a 1 to 10 scale. Each number on the scale is represented by a half star. When you are signed in with your Twitter account, you can click on any half star and that will set your vote to the number represented by that half star. You can change your vote at any time by clicking on any portion of any star.</p>
+                <a name="signinalt" ></a>
+                <h2>Why cant I sign in with a different account?</h2>
+                <img alt="Logout on Twitter" src="/bundles/bestbadtweets/img/help/bestbadtweets_logout.png" />
+                <p>Bestbadtweets.com is only given permission to use your Twitter token. We do not have permission to destroy your Twitter token. Therefore, it is necessary that you destroy your own Twitter token on the Twitter website by logging out @ Twitter.com. To make this easier we have provided a link in our user menu that you can use to visit the logout page on Twitter. Once you have logged out at Twitter, you can log into bestbadtweets with any other account.</p>
+                <a name="sitecontact" ></a>
+                <h2>How can I contact someone for help?</h2>
+                <p> To contact a site administrator send an email to <a title="Contact the webmaster" href="mailto:webmaster@bestbadtweets.com" >webmaster@bestbadtweets.com</a>.</p>
+            </div>
+        </div>
+{% if app.request.isXmlHttpRequest() %}
+    </div>
+</div>
+{% endif %}
+<script>
+    
+    function initBinds() {
+        $('.tweet-text').not('.pretty-link').each(function(i, item) { 
+            $(item).html(replaceURLWithHTMLLinks($(item).html()));
+            $(item).html(addLinkToHash($(item).html()));
+            $(item).html(addLinkToAmp($(item).html()));
+            $(item).addClass('pretty-link');
+        });
+    }
+
+    resizeDashboard();
+    $("abbr.timeago").each(function(i, item) {
+        var tweetDate = new Date($(item).attr('title'));
+        if (tweetDate.addDays(2) > Date.today()) {
+            $(item).timeago();
+        } else {
+            var formattedDate = new Date($(item).attr('title'));
+            $(item).text(formattedDate.toString('d MMM'));
+        }
+    });
+    
+    jQuery(document).ready(function(){
+        initBinds();
+    });
+</script>
+{% endblock %}

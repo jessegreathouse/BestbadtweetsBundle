@@ -1,0 +1,81 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:Tweet:layout.html.twig' %}
+{% block title %}bestbadtweets.com | Privacy Policy {% endblock%}
+{% block details %}
+{% include "BestbadtweetsBundle:Tweet:media.html.twig" %}
+{% if app.request.isXmlHttpRequest() %}
+<div class="inner-pane active">
+  <div class="pane-toolbar pane-built-in">
+    <a href="#" class="pane-close toolbar-control">close <span>×</span></a>
+    <br style="clear: both;">
+  </div>
+  <div class="pane-components" style="height: 481px; " >
+    <div class="pane-components-inner tweet-components">
+{% endif %}
+        <div class="component">
+            <div id="privacy" class="static-page">
+                <h1>
+	                Privacy Policy
+                </h1>
+
+                <p>
+	                Your privacy is very important to us. Accordingly, we have developed this Policy in order for you to understand how we collect, use, communicate and disclose and make use of personal information. The following outlines our privacy policy.
+                </p>
+
+                <ul>
+	                <li>
+		                We will never see or collect any of the following information about Twitter users: e-mail address, password, address, phone numbers.
+	                </li>
+	                <li>
+		               To participate in this website you must log into Twitter. Your twitter account will be used through <a title="Twitter OAuth 1.0a" href="https://dev.twitter.com/docs/auth/oauth/faq" >Twitter OAuth 1.0a</a>. Twitter OAuth permits our website to verify and remember a users Twitter authentication token, but does not give us access to any of the information about that Twitter account other than what is publicly available on a Twitter User profile. We will never use your Twitter authentication token for anything except to publicly identify and authorize you to participate on our website with that token.
+	                </li>
+	                <li>
+		                We keep all user information confidential. We will not disclose any information about our users to any organization or individuals including but not limited to: Businesses, Law Enforcement, Websites, Internet Marketing Agencies, Surveys. We are comitted to protecting your personal information and will protect that information with every legal method possible.
+	                </li>
+	                <li>
+		                Even publicly available Twitter profile information will not be permitted to third parties, and most of our cached user data is encoded with the exception of the following items: Twitter Screen Names, Twitter Id numbers, and Twitter status message text. 
+                    </li>
+                    <li>We cannot be liable for prohibited information which would be incedentially disclosed as part of a user profile or twitter status text. If any such prohibited information is found on our website, the articles containing such information will be removed, and the violating user will be permanently banned from this website. Aforementioned prohibited information includes but is not limited to the following list: Email addresses, passwords, addresses, phone numbers, confidential business information, confidential legal information, illicit sexual content, graphic content depicting violence, unsolicited marketing/advertisements.
+	                </li>
+	                <li>
+		                We will make readily available to customers information about our policies and practices relating to the management of personal information. 
+	                </li>
+                </ul>
+
+                <p>
+	                We are committed to conducting our business in accordance with these principles in order to ensure that the confidentiality of personal information is protected and maintained. 
+                </p>		
+
+			
+            </div>
+        </div>
+{% if app.request.isXmlHttpRequest() %}
+    </div>
+</div>
+{% endif %}
+<script>
+    
+    function initBinds() {
+        $('.tweet-text').not('.pretty-link').each(function(i, item) { 
+            $(item).html(replaceURLWithHTMLLinks($(item).html()));
+            $(item).html(addLinkToHash($(item).html()));
+            $(item).html(addLinkToAmp($(item).html()));
+            $(item).addClass('pretty-link');
+        });
+    }
+
+    resizeDashboard();
+    $("abbr.timeago").each(function(i, item) {
+        var tweetDate = new Date($(item).attr('title'));
+        if (tweetDate.addDays(2) > Date.today()) {
+            $(item).timeago();
+        } else {
+            var formattedDate = new Date($(item).attr('title'));
+            $(item).text(formattedDate.toString('d MMM'));
+        }
+    });
+    
+    jQuery(document).ready(function(){
+        initBinds();
+    });
+</script>
+{% endblock %}

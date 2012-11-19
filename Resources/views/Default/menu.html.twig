@@ -1,0 +1,87 @@
+{% extends 'BestbadtweetsBundle::layout.html.twig' %}
+{% block body %}
+
+            <ul class="stream-tabs">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li class="stream-tab stream-tab-tweeters">
+                        <a href="/suggestions" title="Tweeters" class="tab-text">Suggestions</a>
+                    </li>
+                {% endif %}
+                <li class="stream-tab stream-tab-tweeters">
+                    <a href="/tweeters/latest" title="Tweeters" class="tab-text">Tweeters</a>
+                </li>
+                <li class="stream-tab stream-tab-top-average dropdown-link">
+                    <a href="/top/avg" title="Top Average" class="tab-text">Top Average<i></i></a>
+                    <ul class="drop-down" style="left: 0px; right: auto; top: 30px; display:none; ">
+                        <li class="stream-link" data-item-id="">
+                            <a title="All Time Top Score" href="/top/avg/all">
+                                <b class="item-name">
+                                  All Time
+                                </b>
+                            </a>
+                        </li>
+                        <li class="stream-link" data-item-id="">
+                            <a title="All Time Top Score" href="/top/avg/w">
+                                <b class="item-name">
+                                  Weekly
+                                </b>
+                            </a>
+                        </li>
+                        <li class="stream-link" data-item-id="">
+                            <a title="All Time Top Score" href="/top/avg/t">
+                                <b class="item-name">
+                                  Today
+                                </b>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="stream-tab stream-tab-top-score dropdown-link">
+                    <a href="/top/score" title="Top Score" class="tab-text">Top Score<i></i></a>
+                    <ul class="drop-down" style="left: 0px; right: auto; top: 30px; display:none; ">
+                        <li class="stream-link" data-item-id="">
+                            <a title="All Time Top Score" href="/top/score/all">
+                                <b class="item-name">
+                                  All Time
+                                </b>
+                            </a>
+                        </li>
+                        <li class="stream-link" data-item-id="">
+                            <a title="All Time Top Score" href="/top/score/w">
+                                <b class="item-name">
+                                  Weekly
+                                </b>
+                            </a>
+                        </li>
+                        <li class="stream-link" data-item-id="">
+                            <a title="All Time Top Score" href="/top/score/t">
+                                <b class="item-name">
+                                  Today
+                                </b>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="stream-tab stream-tab-latest">
+                    <a href="/latest" title="Latest" class="tab-text">Latest</a>
+                </li>
+            </ul>
+        </div>
+        </div>
+        <script>
+        jQuery(document).ready(function(){
+            var url = window.location.href;
+            var pieces = url.split('/');
+            if (pieces.length > 3) {
+                var segment = '/' + pieces[3];
+            }
+            if (pieces.length > 4) {
+                segment = segment +  '/' + pieces[4];
+            }
+            $(".stream-tab a[href^='" + segment + "']").parent().addClass('active');
+        });
+        </script>
+        <div class="stream-manager">
+
+{% block content %}{% endblock %}
+{% endblock %}

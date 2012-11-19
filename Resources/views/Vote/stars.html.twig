@@ -1,0 +1,133 @@
+<div id="voting-widget" class="stars" >
+    <div class="star">
+        <div id="vote_1" class="star-left vote-rank" ></div>
+        <div id="vote_2" class="star-right vote-rank" ></div>
+    </div>
+    <div class="star">
+        <div id="vote_3" class="star-left vote-rank" ></div>
+        <div id="vote_4" class="star-right vote-rank" ></div>
+    </div>
+    <div class="star">
+        <div id="vote_5" class="star-left vote-rank" ></div>
+        <div id="vote_6" class="star-right vote-rank" ></div>
+    </div>
+    <div class="star">
+        <div id="vote_7" class="star-left vote-rank" ></div>
+        <div id="vote_8" class="star-right vote-rank" ></div>
+    </div>
+    <div class="star">
+        <div id="vote_9" class="star-left vote-rank" ></div>
+        <div id="vote_10" class="star-right vote-rank" ></div>
+    </div>
+</div>
+
+<div id="scores-widget" >
+    {% if not is_granted('ROLE_USER') %}
+    <div class="login-link">
+        <a title="Login to vote" href="{{ path('_secured') }}">Sign in with a Twitter ID to vote</a>
+    </div>
+    {% endif %}
+    <div id="average-score" class="score">
+        <p class="score-label">
+            Average
+        </p>
+        <p class="score-content">
+            0
+        </p>
+    </div>
+    {% if is_granted('ROLE_USER') %}
+    <div id="user-score" class="score">
+        <p class="score-label">
+            Your Vote
+        </p>
+        <p class="score-content">
+            0
+        </p>
+    </div>
+    {% endif %}
+    <div id="total-score" class="score">
+        <p class="score-label">
+            Score
+        </p>
+        <p class="score-content">
+            0
+        </p>
+    </div>
+</div>
+
+<script>
+originalVote = {};
+function calibrateRating(element) {
+    if (element.length == 0) {
+        var rank = 0;
+    } else {
+        var id = $(element).attr('id');
+        var rank = parseInt(id.substring(5));
+    };
+    $('.vote-rank').each(function(i, item) {
+        var itemId = $(item).attr('id');
+        var itemRank = parseInt(itemId.substring(5));
+        var side = 'left';
+        if (itemRank%2 == 0) {
+            side = 'right';
+        }
+        if (itemRank <= rank) {
+            $(item).addClass('star-' + side + '-active');
+        } else {
+            $(item).removeClass('star-' + side + '-active');
+        }
+    });
+}
+
+function setUserScore(score) {
+    if (score > 0) {
+        $('#user-score p.score-content').text(score);
+    }
+}
+
+function setAvgScore(score) {
+    $('#average-score p.score-content').text(score);
+}
+
+function setTotalScore(score) {
+    $('#total-score p.score-content').text(score);
+}
+
+jQuery(document).ready(function(){
+    $.ajax({
+      url: "{{ path('vote', { 'id_str': tweet.id_str }) }}",
+      success: function(vote){
+        originalVote = vote;
+        setUserScore(vote.userScore);
+        setAvgScore(vote.tweetAvg);
+        setTotalScore(vote.tweetScore);
+        calibrateRating($('#vote_' + vote.tweetAvg));
+      }
+    });
+    
+    {% if is_granted('ROLE_USER') %}
+    $('.vote-rank').hover(function() {
+        calibrateRating(this);
+    }, function() {
+        calibrateRating($('#vote_' + originalVote.tweetAvg));
+    });
+    
+    $('.vote-rank').click(function() {
+        var id = $(this).attr('id');
+        var rank = parseInt(id.substring(5));
+        $.ajax({
+          url: "{{ path('vote', { 'id_str': tweet.id_str }) }}&score=" + rank,
+          success: function(vote){
+            originalVote = vote;
+            setUserScore(vote.userScore);
+            setAvgScore(vote.tweetAvg);
+            setTotalScore(vote.tweetScore);
+            calibrateRating($('#vote_' + vote.tweetAvg));
+          }
+        });
+        return false;
+    });
+    {% endif %}
+});
+</script>
+

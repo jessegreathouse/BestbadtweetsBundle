@@ -1,0 +1,51 @@
+
+{% if mediaItems is defined %}
+    {% block media %}
+    
+    {% macro youtube(item) %}
+        <div data-media-type="Youtube" data-url-id="{{ item.dataUrl }}" class="media-instance-container youtube-container">
+            <iframe width="315" height="266" src="{{ item.embedUrl }}"></iframe>
+            <span class="flag-container">
+                <a alternatetext="Un-flag this media" class="flaggable" href="#">Flag this media</a>
+            </span>
+            <div class="media-attribution">
+                <img src="//www.youtube.com/favicon.ico">
+                <a href="//www.youtube.com" class="media-attribution-link" data-media-type="Youtube" target="_blank">YouTube</a>
+            </div>
+        </div>
+    {% endmacro %}
+    
+    {% macro twitpic(item) %}
+        <div class="media-instance-container twitpic-container" data-url-id="{{ item.dataUrl }}" data-media-type="TwitPic">
+            <div class="twitpic">
+                <a class="inline-media-image" data-inline-type="TwitPic" href="{{ item.dataUrl }}" target="_blank">
+                    <img src="{{ item.embedUrl }}">
+                </a>
+            </div>
+            <span class="flag-container">
+                <a href="#" class="flaggable" alternatetext="Un-flag this media">Flag this media</a>
+            </span>
+            <div class="media-attribution">
+                <img src="//twitpic.com/favicon.ico" />
+                <a target="_blank" data-media-type="TwitPic" class="media-attribution-link" href="//twitpic.com">TwitPic</a>
+            </div>
+        </div>
+    {% endmacro %}
+    
+    
+    <div class="tweet-media-container">
+        <div class="component">
+            <div class="tweet-media">
+            {% for item in mediaItems %}
+                {% if item.type == "youtube" %}
+                    {{ _self.youtube(item) }}
+                {% elseif item.type == "twitpic" %}
+                    {{ _self.twitpic(item) }}
+                {% endif %}
+            {% endfor %}
+            </div>
+            <hr class="component-spacer">
+        </div>
+    </div>
+    {% endblock %}
+{% endif %}

@@ -1,0 +1,140 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:User:layout.html.twig' %}
+{% block title %} bestbadtweets | {{ user.screen_name }} | {{ user.description }} {% endblock title %}
+{% block details %}
+{% include "BestbadtweetsBundle:User:images.html.twig" %}
+{% if app.request.isXmlHttpRequest() %}
+<div class="inner-pane active">
+  <div class="pane-toolbar pane-built-in">
+    <a href="#" class="pane-close toolbar-control">close <span>×</span></a>
+    <br style="clear: both;">
+  </div>
+  <div class="pane-components" style="height: 605px; " >
+    <div class="pane-components-inner">
+{% endif %}
+        <div class="component">
+            <div class="profile-pane" data-user-id="{{ user.id_str }}">
+                <div class="profile-basics clearfix">
+                    <div class="profile-text">
+                        <a href="http://www.twitter.com/#!/{{ user.screen_name }}" target="_blank">
+                            <img src="{{ user.profile_image_url }}" alt="{{ user.name }}" width="128" class="thumb" data-user-id="{{ user.id_str }}">
+                        </a>
+                        <div class="profile-info-wrapper">
+                            <div class="full-name">
+                                <h2>{{ user.name }}</h2>
+                            </div>
+                            <div class="screen-name-and-location">
+                                <a href="http://www.twitter.com/#!/{{ user.screen_name }}" class="screen-name pill" target="_blank">
+                                    <strong>@{{ user.screen_name }}</strong>
+                                    <span>view on Twitter →</span>
+                                </a>
+                            </div>
+                            {% if user.location is defined %}
+                                <div class="location">{{ user.location }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <span class="bio">{{ user.description }}</span>
+                        {% if user.url is defined %}
+                        <a href="{{ user.url }}" target="_blank">{{ user.url }}</a>
+                        {% endif %}
+                    </div>
+                    <ul class="user-stats clearfix">
+                        <li>
+                            <a class="user-stats-count" href="http://www.twitter.com/#!/{{ user.screen_name }}" target="_blank">
+                                {{ user.statuses_count }}
+                                <span class="user-stats-stat">Tweets</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="user-stats-count" href="http://www.twitter.com/#!/{{ user.screen_name }}/following" target="_blank">
+                                {{ user.friends_count }}
+                                <span class="user-stats-stat">Following</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="user-stats-count" href="http://www.twitter.com/#!/{{ user.screen_name }}/followers" target="_blank">
+                                {{ user.followers_count }}
+                                <span class="user-stats-stat">Followers</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="user-stats-count" href="http://www.twitter.com/#!/{{ user.screen_name }}/lists/memberships" target="_blank">
+                                {{ user.listed_count }}
+                                <span class="user-stats-stat">Listed</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            {% if block('twitterImages') %}
+                {{ block('twitterImages') }}
+            {% endif %}
+            
+            <div class="component">
+                <div class="recent-tweets">
+                    <h3 class="profile-title">Bad Tweets</h3>
+                    {% for tweet in tweets %}
+                    <div class="stream-item">
+                        <div class="more">»</div>
+                        <div class="stream-item-content tweet js-actionable-tweet stream-tweet simple-tweet " data-tweet-id="{{ tweet.id_str }}" data-item-id="{{ tweet.id_str }}" data-screen-name="{{ tweet.user.screen_name }}" data-user-id="{{ tweet.user.id_str }}">
+                            <div class="tweet-dogear"></div>
+                            <div class="tweet-image simple-tweet-image">
+                                <img height="32" width="32" src="{{ tweet.user.profile_image_url }}" alt="{{ tweet.user.name }}" class="user-profile-link" data-user-id="{{ user.id_str }}">
+                            </div>
+                            <div class="tweet-content simple-tweet-content">
+                                <div class="tweet-row">
+                                    <span class="tweet-user-name">
+                                        <a class="tweet-screen-name user-profile-link" data-user-id="{{ tweet.user.id_str }}" href="/#!/{{ tweet.user.screen_name }}" title="{{ tweet.user.name }}">{{ tweet.user.screen_name }}</a>
+                                        <span class="tweet-full-name">{{ tweet.user.name }}</span>
+                                    </span>
+                                    <div class="tweet-corner">
+                                        <div class="tweet-meta">
+                                            <span class="icons">
+                                                <div class="extra-icons">
+                                                    <span class="inlinemedia-icons"></span>
+                                                </div>
+                                            </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tweet-row">
+                                <div class="tweet-text pretty-link">
+                                    {{ tweet.text }}
+                                </div>
+                            </div>
+                            <div class="tweet-row">
+                                <a title="{{ tweet.created_at }}" class="tweet-timestamp" href="/#!/{{ tweet.user.screen_name }}/status/{{ tweet.id_str }}">
+                                    <span data-long-form="true" data-time="{{ tweet.id_str }}" class="_old-timestamp">
+                                        <abbr class="timeago" title="{{ tweet.created_at|date("c") }}" ></abbr>
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="tweet-row">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <a href="http://www.twitter.com/#!/{{  user.screen_name }}" class="more-link" target="_blank">All Tweets from @{{ user.screen_name }} →</a>
+            </div>
+{% if app.request.isXmlHttpRequest() %}
+            <hr class="component-spacer">
+        </div>
+    </div>
+</div>
+{% endif %}
+<script>
+    resizeDashboard();
+    $("abbr.timeago").each(function(i, item) {
+        var tweetDate = new Date($(item).attr('title'));
+        if (tweetDate.addDays(2) > Date.today()) {
+            $(item).timeago();
+        } else {
+            var formattedDate = new Date($(item).attr('title'));
+            $(item).text(formattedDate.toString('d MMM'));
+        }
+    });
+</script>
+{% endblock %}

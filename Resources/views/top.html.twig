@@ -1,0 +1,54 @@
+<div id="banners" style="clear:both;"></div> 
+<div id="top-bar-outer"> 
+    <div id="top-bar-bg"></div> 
+    <div id="top-bar"> 
+        <div class="top-bar-inside"> 
+            <div class="static-links"> 
+                <div id="logo"> 
+                    <a href="/">BestBadTweets</a> 
+                </div> 
+                <form id="search-form" action="/search" method="GET"> 
+                    <span class="glass"><i></i></span> 
+                    <input value="" placeholder="Search" name="q" id="search-query" type="text" /> 
+                </form> 
+                <div id="global-nav"> 
+                    <ul> 
+                        <li id="global-nav-home"><a href="/top">Top</a></li> 
+                        <li id="global-nav-profile"><a href="/latest">Latest</a></li> 
+                        <li id="global-nav-messages"><a href="/tweeters">Bad Tweeters</a></li>
+                    </ul> 
+                </div> 
+                <div id="sections"></div> 
+            </div> 
+            <div class="active-links"> 
+                <span class="vr"></span>
+                {% if is_granted('ROLE_TWITTER') %}
+                <span id="session" class="loggedin"> 
+                    <a class="profile-links" href="#"> 
+                        <img src="{{ app.user.twitterUser.twitterUser.profile_image_url }}">
+                    </a>
+                    <span id="screen-name"> 
+                        {{ app.user.twitterUser.twitterUser.screen_name }}
+                    </span>&nbsp;
+                    <span id="screen-name-dropdown">&nbsp;</span> 
+                    <div class="dropdown" style="display: none"> 
+                        <ul class="user-dropdown"> 
+                            <li><a href="/about">About</a></li> 
+                            <li><a href="/help">Help</a></li> 
+                            <li><a href="/logout">Logout</a></li>
+                            <li><a href="https://twitter.com/#!/logout">Logout @Twitter</a></li> 
+                        </ul> 
+                    </div> 
+                </span>
+                {% else %}
+                <div id="session" class="loggedout" >
+                    <a href="/secured" id="signin-link">
+                    <em>Have a Twitter account?</em>
+                    <strong>Sign in</strong><i></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

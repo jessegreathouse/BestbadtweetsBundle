@@ -1,0 +1,121 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:Default:menu.html.twig' %}
+{% if users is not empty %}
+    {% set search_title = users[0].description %}
+{% else %}
+    {% set search_title = 'No Bad Tweeters found for this search.' %}
+{% endif %}
+{% block title %} bestbadtweets | Bad Tweeters | {{ search_title }} {% endblock title %}
+{% block content %}
+{% if not app.request.isXmlHttpRequest() %}
+
+<div class="stream-container">
+    <div class="stream">
+        <div class="stream-items">
+
+{% endif %}      
+            {% if users is not empty %}
+                {% for user in users %}
+                    <div data-item-type="user" data-item-id="{{ user.id_str }}" class="stream-item">
+                        <div data-screen-name="{{ user.screen_name }}" class="stream-item-content user-content-medium clearfix " data-user-id="{{ user.id_str }}">
+                            <img data-user-id="{{ user.id_str }}" class="user-content-image user-profile-link" alt="{{ user.name }}" src="{{ user.profile_image_url }}">
+                            <!--
+                            <div class="stream-user-buttons">
+                                <div data-user-id="{{ user.id_str }}" class="button unfollow-button">
+                                    <span class="you-follow"></span>
+                                    <em class="wrapper">
+                                        <b class="unfollow">Unfollow</b>
+                                        <b>Following</b>
+                                    </em>
+                                </div>
+                                <div class="drop-down-container">
+                                    <div data-user-id="{{ user.id_str }}" class="button user-profile-actions-button" data-opened="true">
+                                        <span class="user-actions"></span>
+                                        <span class="down-arrow"></span>
+                                    </div>
+                                    <ul style="visibility: hidden; left: auto; right: 0pt; top: 16px;" class="drop-down">
+                                        <li class=" profactions">
+                                            <span class="list mention"></span>
+                                            <b class="item-name">Mention {{ user.screen_name }}</b>
+                                        </li>
+                                        <li class=" profactions">
+                                            <span class="list user-list"></span>
+                                            <b class="item-name">Add to list</b>
+                                        </li>
+                                        <li class=" profactions">
+                                        <span class="list block"></span>
+                                        <b class="item-name">Block {{ user.screen_name }}</b>
+                                        </li>
+                                        <li class=" profactions">
+                                            <span class="list spam"></span>
+                                            <b class="item-name">Report <span class="truncate">{{ user.screen_name }}</span> for spam</b>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            -->
+                            <div class="user-content-rest">
+                                <span class="user-name">
+                                    <a title="{{ user.name }}" href="/#!/{{ user.screen_name }}" data-user-id="{{ user.id_str }}" class="user-profile-link">
+                                        <strong>{{ user.screen_name }}</strong>
+                                    </a>
+                                    <span class="full-name">{{ user.name }}</span>
+                                    {% if user.verified %}
+                                        <span title="Verified Account" class="verified-icon-small"></span>
+                                    {% endif %}
+                                </span>
+                                <div class="user-description">{{ user.description }}</div>
+                                <!--
+                                <div class="user-meta">
+                                    <span class="followed-by-you">Followed by you!</span>
+                                </div>
+                                -->
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% if not app.request.isXmlHttpRequest() %}
+                    <div class="stream-end">
+                        <img src="/bundles/bestbadtweets/img/tiny-timeline-bird.png" class="stream-end-bird">
+                        No Twitter users found in this search.
+                    </div>
+                {% endif %}
+            {% endif %}
+{% if not app.request.isXmlHttpRequest() %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function fetchMoreTweets()
+    {
+        $('.stream-end').html('<img class="tweet-spinner" src="/bundles/bestbadtweets/img/loader.gif" />');
+
+        var offset = ($('.stream-item').length + 1);
+        $.ajax({
+          url: window.location.pathname + "?offset=" + offset,
+          success: function(data){
+            if ($.trim(data) != "") {
+                $(".stream-items .stream-item:last").after(data);
+                $('.stream-end').empty();        
+            } else {
+               $('.stream-end').html('<img src="/bundles/bestbadtweets/img/tiny-timeline-bird.png" class="stream-end-bird" /><a href="#" class="back-to-top">Back to top ↑</a>');
+            }
+          }
+        });
+    };
+
+    jQuery(document).ready(function(){
+        $(window).scroll(function(){
+            if  ($(window).scrollTop() == $(document).height() - $(window).height()){
+                fetchMoreTweets();
+            }
+        });
+        $('.back-to-top').live('click', function() {
+            $(window).scrollTop(0);
+        });
+    });
+</script>
+
+{% endif %}
+{% endblock %}

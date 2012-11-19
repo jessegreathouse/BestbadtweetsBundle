@@ -1,0 +1,224 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:Default:menu.html.twig' %}
+{% if comments is not empty %}
+    {% set comment_title = comments[0].content %}
+{% else %}
+    {% set comment_title = 'Comments' %}
+{% endif %}
+{% block title %} bestbadtweets | {{ comment_title }} {% endblock title %}
+{% form_theme form 'BestbadtweetsBundle::fields.html.twig' %}
+
+{% macro render_comment(comment) %}
+    <div id="comment-{{ comment.id }}" class="comment" >
+        <div class="comment-header" >
+            <div class="comment-screen_name">
+                <a title="{{ comment.user.twitterUser.twitterUser.name }}" href="/user?id_str={{ comment.user.twitterUser.twitterUser.id_str }}" data-user-id="{{ comment.user.twitterUser.twitterUser.id_str }}" class="tweet-user-block-screen-name user-profile-link">@{{ comment.user.twitterUser.twitterUser.screen_name }}</a>
+            </div>
+            <div class="comment-date">
+                <span data-long-form="true" data-time="{{ comment.id }}" class="_old-timestamp">
+                    <abbr class="timeago" title="{{ comment.createdDate.format("c") }}" ></abbr>
+                </span>
+            </div>
+            <div class="comment-like">
+                <span id="like-count-{{ comment.id }}" >&#43; {{ comment.commentVotes.count }}</span>
+                <div class="like {{ user_liked(app.security.token.user, comment.commentVotes) ? 'active' : '' }}" like-data-id="{{ comment.id }}"></div>
+            </div>
+        </div>
+        <div class="comment-body" >
+            <div class="comment-left" >
+                <div class="comment-avatar-block">
+                    <a href="/user?id_str={{ comment.user.twitterUser.twitterUser.id_str }}" ><img data-user-id="{{ comment.user.twitterUser.twitterUser.id_str }}" class="tweet-avatar-image user-profile-link" alt="{{ comment.user.twitterUser.twitterUser.name }}" src="{{ comment.user.twitterUser.twitterUser.profile_image_url }}"></a>
+                </div>
+            </div>
+            <div class="comment-right" >
+                {{ comment.content }}
+            </div>
+        
+            <div class="comment-replies" >
+                <div class="replies-header">
+                    <span class="button show-reply-action" >
+                        {{ comment.replies.count }} replies
+                    </span>
+                    <span class="vr" ></span>
+                    <span class="button reply-action" data-comment-id="{{ comment.id }}" >
+                        reply
+                    </span>
+                </div>
+                <div class="reply-form" data-comment-id="{{ comment.id }}" >
+                </div>
+                <div class="replies-body" >
+                {% if comment.replies.count > 0 %}
+                    {% for reply in comment.replies %}
+                        {{  _self.render_comment(reply) }}
+                    {% endfor %}
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% block content %}
+    {% if app.request.query.get('offset') %}
+        {% for comment in comments %}
+            {{  _self.render_comment(comment) }}
+        {% endfor %}
+    {% else %}
+        {% if not is_granted('ROLE_USER') %}
+        <div class="comment-form">
+            <a title="Login to comment" href="{{ path('_secured') }}">Sign in with a Twitter ID to comment</a>
+        </div>
+        {% else %}
+        <div id="comment-form">
+            <form action="{{ form_action }}" method="post" {{ form_enctype(form) }}>
+                {{ form_widget(form) }}
+                <input type="submit" />
+            </form>
+        </div>
+        {% endif %}
+
+        {% if comments is not empty %} 
+        <div class="comments" data-tweet-id="{{ tweetId }}" >
+            {% for comment in comments %}
+                {{  _self.render_comment(comment) }}
+            {% endfor %}
+        </div>
+        <div class="comment-stream-end"></div>
+        {% else %}
+        <div class="comments" >
+            No Comments
+        </div>
+        {% endif %}
+
+        <script>
+        
+        function initBinds() {
+            $("abbr.timeago").each(function(i, item) {
+                var tweetDate = new Date($(item).attr('title'));
+                if (tweetDate.addDays(2) > Date.today()) {
+                    $(item).timeago();
+                } else {
+                    var formattedDate = new Date($(item).attr('title'));
+                    $(item).text(formattedDate.toString('d MMM'));
+                }
+
+                $('.comment-right').not('.pretty-link').each(function(i, item) { 
+                    $(item).html(replaceURLWithHTMLLinks($(item).html()));
+                    $(item).html(addLinkToHash($(item).html()));
+                    $(item).html(addLinkToAmp($(item).html()));
+                    $(item).addClass('pretty-link');
+                });
+            });
+
+            $('input[type=hidden]').attr('value', '0');
+            
+            $('#comment-form form').unbind('submit');
+            $('#comment-form form').submit(function() {
+                $.post($(this).attr('action'), $(this).serialize(), function(data) {
+                     $('#tweet-comments').html(data);
+                     $('.textarea-widget').val('');
+                });
+                return false;
+            });
+            
+            $('.show-reply-action').unbind('click');
+            $('.show-reply-action').click(function() {
+	            var repliesContainer = $(this).parent().parent().find('.replies-body:first');
+
+	            if (!$(repliesContainer).is(":visible") ) {
+                    $(repliesContainer).fadeIn(300);
+                } else {
+                    $(repliesContainer).fadeOut(300);
+                }
+	        });
+	        
+	        {% if is_granted('ROLE_USER') %}
+	        $('.like').unbind('click');
+            $('.like').click(function() {
+                var id = $(this).attr('like-data-id');
+                $.ajax({
+                  url: "{{ path('like') }}?comment_id=" + id,
+                  element: this,
+                  id: id,
+                  success: function(data){
+                    if (data.result == 'success') {
+                        if (data.action == 'remove') {
+                            $(this.element).removeClass('active');
+                        } else {
+                            $(this.element).addClass('active');
+                        }
+                        $('#like-count-' + this.id).html('&#43; ' + data.commentVoteCount);
+                    }
+                  }
+                });
+                return false;
+            });
+            
+            $('.reply-action').unbind('click');
+            $('.reply-action').click(function() {
+	            var comment_id = $(this).attr('data-comment-id');
+	            var replyContainer = $(this).parent().parent().find('.reply-form:first');
+
+	            if (!$(replyContainer).is(":visible") ) {
+                    $('#comment-form form').clone().appendTo(replyContainer);
+                    $(replyContainer).children().find('input[type=hidden]').attr('value', comment_id);
+                    $(replyContainer).find('.textarea-widget').val('');
+                    $(replyContainer).find('label').html('Reply');
+                    $(replyContainer).find('form').submit(function() {
+                        $.post($(this).attr('action'), $(this).serialize(), function(data) {
+                             $('#tweet-comments').html(data);
+                             $('.textarea-widget').val('');
+                        });
+                        return false;
+                    });
+                    $(replyContainer).fadeIn(300);
+                } else {
+                    $(replyContainer).fadeOut(300);
+                    $(replyContainer).find('.reply-form form').unbind('submit');
+                    $(replyContainer).empty();
+                }
+	        });
+            
+            {% endif %}
+        }
+        
+        function fetchMoreComments()
+        {
+            $('.comment-stream-end').html('<img class="tweet-spinner" src="/bundles/bestbadtweets/img/loader.gif" />');
+            var tweet_id = $('.comments').attr('data-tweet-id');
+            var offset = ($('#tweet-comments > .comments .comment').length + 1);
+            $.ajax({
+              url: '/comments' + '?id_str=' + tweet_id + '&offset=' + offset,
+              success: function(data){
+                if ($.trim(data) != "") {
+                    $("#tweet-comments > .comments > .comment:last").after(data);
+                    $('.comment-stream-end').empty(); 
+                    initBinds();       
+                } else {
+                   $('.comment-stream-end').html('<img src="/bundles/bestbadtweets/img/tiny-timeline-bird.png" class="stream-end-bird" /><a href="#" class="back-to-comment-top">Back to top ↑</a>');
+                   $('.back-to-comment-top').unbind('click');
+	               $('.back-to-comment-top').click(function() {
+                        $('.pane-components').scrollTop(0);
+                        return false;
+                    });
+                }
+              }
+            });
+        };
+        
+        jQuery(document).ready(function(){
+            
+            initBinds();
+            
+            $('.pane-components').scroll(function(){
+                var gap = $('.pane-components').height() + ($('.pane-components-inner').height() - $('.pane-components').get(0).scrollHeight);
+                if (($('.pane-components-inner').height() - gap ) == $('.pane-components').scrollTop()){
+                    if ($('.comment-stream-end').is(':empty')) { 
+                        fetchMoreComments();
+                    }
+                }
+            });
+            
+         });
+        </script>
+    {% endif %}
+{% endblock %}

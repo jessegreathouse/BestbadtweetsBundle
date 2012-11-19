@@ -1,0 +1,62 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:Tweet:layout.html.twig' %}
+{% block title %}bestbadtweets.com | About {% endblock%}
+{% block details %}
+{% include "BestbadtweetsBundle:Tweet:media.html.twig" %}
+{% if app.request.isXmlHttpRequest() %}
+<div class="inner-pane active">
+  <div class="pane-toolbar pane-built-in">
+    <a href="#" class="pane-close toolbar-control">close <span>×</span></a>
+    <br style="clear: both;">
+  </div>
+  <div class="pane-components" style="height: 481px; " >
+    <div class="pane-components-inner tweet-components">
+{% endif %}
+        <div class="component">
+            <div id="about" class="static-page">
+                <h1>About bestbadtweets.com</h1>
+                <p>bestbadtweets.com is a web application that aggregates the best of the worst tweets on Twitter. <strong>This is not a Twitter website and is not affiliated with Twitter</strong> or any other media company. Some tweets are nominated internally but also some nominations are suggested by the community.</p>
+
+                <p>This site was registered, designed and programmed by <a title="Jesse Greathouse" href="http://twitter.com/#!/jessegreathouse" >@jessegreathouse</a>, just another Twitter user. The idea of the site was conceived when Jesse read an article about the worst tweets. He realized that there was some humorous value in truly bad tweets, but in the context of a single article, there was no official recognition to these tweets other than the author randomly targeting a few arbitrary tweets. The idea of bestbadtweets.com is that the Twitter community can suggest and also vote on which are the best of the worst tweets on Twitter.</p>
+
+                <h2> No malice intended </h2>
+                <p>The purpose of this site is not to insult, make-fun-of, or otherwise ridicule any of the participants or the tweeters involved. We like to focus on the tweet itself and not who is responsible for it. It is not meant to single out or hurt any individual. We all like to joke, laugh and have fun, and if a tweet of yours is nominated, please realize  it is in the spirit of having fun and not being rude or hateful. Please consider it a compliment that someone got a laugh out of your tweet. You just brightened someones day</p>
+
+                <h2> Disclaimer </h2>
+                <p> This site has no affiliation with Twitter or any media organization. This site was soley produced by a single person and is moderated by a very small amount of individuals. This site is meant to offer a fun service for indivduals who are fans of Twitter, but the site owner does not claim any official Twitter authority. This site follows and maintains it's rules according to the <a href="https://dev.twitter.com/terms/api-terms" title="Twitter API terms of use" >official Twitter public API terms of use </a>, and any assets, features or use of Twitter content is within the rules outlined by Twitter. Any information, published on this site, is permitted under the Twitter API terms of use, but does not indicate or reflect the opinion of Twitter.</p>
+                <p>We do not keep public information about any Twitter users except what is available on their public profile. We do not keep most profile information in plain text, everything except Twitter id numbers, Twitter screen names, and tweet content text are encoded. Furthermore we do not ever receive nor keep the following items: email addresses, passwords, addresses, phone numbers. Any occurance of that information will only be found if it is incedentally published in a Twitter user profile or status message. We will not <strong>EVER</strong> distribute any user profile information to any third party  (including that which is publicly available on a users profile). <strong>We hate spammers</strong>  and we strongly feel like this world is better off without the nuisance of unsolicited communication from spammers. </p>
+                
+                <h2> Contact </h2>
+                <p>If you have any questions or concerns about this website, use thereof, or would like to report abuse or infractions, please send an email to <a title="Email of Webmaster" href="mailto:webmaster@bestbadtweets.com" >webmaster@bestbadtweets.com</a>.</p>
+            </div>
+        </div>
+{% if app.request.isXmlHttpRequest() %}
+    </div>
+</div>
+{% endif %}
+<script>
+    
+    function initBinds() {
+        $('.tweet-text').not('.pretty-link').each(function(i, item) { 
+            $(item).html(replaceURLWithHTMLLinks($(item).html()));
+            $(item).html(addLinkToHash($(item).html()));
+            $(item).html(addLinkToAmp($(item).html()));
+            $(item).addClass('pretty-link');
+        });
+    }
+
+    resizeDashboard();
+    $("abbr.timeago").each(function(i, item) {
+        var tweetDate = new Date($(item).attr('title'));
+        if (tweetDate.addDays(2) > Date.today()) {
+            $(item).timeago();
+        } else {
+            var formattedDate = new Date($(item).attr('title'));
+            $(item).text(formattedDate.toString('d MMM'));
+        }
+    });
+    
+    jQuery(document).ready(function(){
+        initBinds();
+    });
+</script>
+{% endblock %}

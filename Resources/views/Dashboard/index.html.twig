@@ -1,0 +1,273 @@
+<div class="component" id="system-message">
+    <div class="tweet-activity">
+        <h2>
+            <a class="title-link" href="#">
+                System Message
+            </a>
+        </h2>
+        <div data-screen-name="bestbadtweets" data-tweet-id="" class="tweet">
+            <div class="tweet-row">
+                <span class="content dashboard-status-item" style="display:none">
+                    <a title="{{ 'now'|date("c") }}" class="tweet-timestamp" href="#">
+                        <span data-long-form="true" class="_old-timestamp"></span>
+                    </a>
+                    <div class="tweet-text"></div>
+                </span>
+            </div>
+        </div>
+    </div>
+    <hr class="component-spacer">
+</div>
+
+<div class="component" id="top-tweets">
+    <div id="weekly-top" class="your-activity following-activity">
+      <h2>
+        <a class="title-link" href="/top/score/w">
+            <span class="dashboard-component-title">Weekly Bad Tweets</span>
+        </a>
+      </h2>
+      <ul class="inline-list">
+          <li class="user-thumb-list-member dashboard-stream-item" style="display:none">
+                <img width="24" height="24" title="" src="/bundles/bestbadtweets/img/tiny-timeline-bird.png">
+          </li>
+      </ul>
+    </div>
+      
+    <div id="alltime-top" class="your-activity new-followers-activity">
+      <h2>
+        <a class="title-link" href="/top/score">
+            <span class="dashboard-component-title">All Time Bad Tweets</span>
+        </a>
+      </h2>
+      <ul class="inline-list">
+          <li class="user-thumb-list-member dashboard-stream-item" style="display:none">
+                <img width="24" height="24" title="" src="/bundles/bestbadtweets/img/tiny-timeline-bird.png">
+          </li>
+      </ul>
+    </div>
+
+    <hr class="component-spacer">
+</div>
+
+<div class="component" id="trending-today">
+    <div class="user-rec-inner">
+      <h2>
+        <a class="title-link" href="/top/score/t">
+            <span class="dashboard-component-title">Trending Today</span>
+        </a>
+      </h2>
+      <ul class="recommended-followers user-rec-component">
+        <li data-tweet-id="" class="dashboard-list-item tweet" style="display:none">
+            <div class="user-thumb">
+                <img data-user-id="" class="user-profile-link" alt="" src="">
+            </div>
+            <div class="tweet-content">
+                <div class="tweet-row">
+                    <span class="tweet-user-name">
+                        <a title="" href="" data-user-id="" class="tweet-screen-name user-profile-link"></a>
+                        <span class="tweet-full-name"></span>
+                    </span>
+                </div>
+                <div class="tweet-row">
+                    <div class="tweet-text"></div>
+                </div>
+            </div>
+        </li>
+      </ul>
+    </div>
+    <hr class="component-spacer">
+</div>
+
+<div class="component" id="recent-comments">
+    <div class="trends-inner">
+        <h2>Recent Comments </h2>
+        <ul class="recent-comments">
+            <li data-tweet-id="" class="dashboard-list-item tweet" style="display:none">
+                <div class="user-thumb">
+                    <img data-user-id="" class="user-profile-link" alt="" src="">
+                </div>
+                <div class="tweet-content">
+                    <div class="tweet-row">
+                        <span class="tweet-user-name">
+                            <a title="" href="" data-user-id="" class="tweet-screen-name user-profile-link"></a>
+                            <span class="tweet-full-name"></span>
+                        </span>
+                    </div>
+                    <div class="tweet-row">
+                        <div class="tweet-text"></div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <hr class="component-spacer">
+</div>
+
+<div class="component" id="site-map">
+    <div class="footer inline-list">
+        <ul>
+            <li><a href="/about">About</a></li>
+            <li><a href="/help">Help</a>
+            <li><a href="/privacy">Privacy</a></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+
+    function initDashboard() {
+        convertPrettyLinks()
+        adjustTimestamps();
+            
+        $('.footer.inline-list a').click(function() {
+            var hidden = $('.details-pane:hidden');
+	        var showOrHide = false;
+
+	        if ( hidden.length > 0 ) {
+              showOrHide = true;
+            }
+            $('.details-pane').load($(this).attr('href'), {}, function() { $('.details-pane').toggle(showOrHide); });
+            return false;
+        });
+    }
+    
+    function serviceCalls() {
+        systemMessage();
+        getTop('#weekly-top', '{{ path('top_score', {'_format':'json', 'span':'w', 'limit':5}) }}' );
+        getTop('#alltime-top', '{{ path('top_score', {'_format':'json', 'span':'all', 'limit':5}) }}' );
+        trendingToday('#trending-today', '{{ path('top_score', {'_format':'json', 'span':'t', 'limit':5}) }}' );
+        recentComments('#recent-comments', '{{ path('comments_recent', {'_format':'json', 'limit':5}) }}' );
+    }
+    
+    function convertPrettyLinks() {
+        query = getParameterByName('q');
+        $('.tweet-text').not('.pretty-link').each(function(i, item) { 
+            $(item).html(replaceURLWithHTMLLinks($(item).html()));
+            $(item).html(addLinkToHash($(item).html()));
+            $(item).html(addLinkToAmp($(item).html()));
+            if (query != "") {
+                $(item).html(searchTextBold($(item).html(), query));
+            }
+            $(item).addClass('pretty-link');
+        });
+    }
+    
+    function adjustTimestamps() {
+        $("abbr.timeago").each(function(i, item) {
+            var tweetDate = new Date($(item).attr('title'));
+            if (tweetDate.addDays(2) > Date.today()) {
+                $(item).timeago();
+            } else {
+                var formattedDate = new Date($(item).attr('title'));
+                $(item).text(formattedDate.toString('d MMM'));
+            }
+        });
+    }
+    
+    function systemMessage() {
+        $.ajax({
+          url: "{{ path('dashboard_system_message', {'_format':'json'}) }}",
+          success: function(data){
+            if (data != null) {
+                $('#system-message').find('.tweet').attr('data-tweet-id', data.id_str);
+                $('#system-message').find('.tweet').attr('data-screen-name', data.user.screen_name);
+                $('#system-message').find('.tweet-text').removeClass('pretty-link');
+                $('#system-message').find('.tweet-text').text(data.text);
+                $('#system-message').find('.tweet-timestamp').attr('title', data.created_at);
+                $('#system-message').find('.tweet-timestamp ._old-timestamp').html('<abbr class="timeago" title="' + data.created_at + '" ></abbr>');
+                initDashboard();
+                $('#system-message .dashboard-status-item').fadeIn('slow');
+            }
+          }
+        });
+    }
+    
+    function getTop(element, callUrl) {
+        $.ajax({
+          url: callUrl,
+          success: function(data){
+            if (data != null) {
+                $(element).find('.user-thumb-list-member:gt(0)').remove();
+                var template  = $(element).find('.user-thumb-list-member:first');
+                for (var i = 0; i < data.length; i++) {
+                    var item = $(template).clone();
+                    var tweet = data[i];
+                    $(item).find('img').addClass('tweet');
+                    $(item).find('img').attr('data-tweet-id', tweet.id_str);
+                    $(item).find('img').attr('src', tweet.user.profile_image_url);
+                    $(element).find('.user-thumb-list-member:last').after($(item));
+                }
+                $(element).find('.user-thumb-list-member:first').remove();
+                initDashboard();
+                $(element).find('.dashboard-stream-item').fadeIn('slow');
+            }
+          }
+        });
+    }
+    
+    function trendingToday(element, callUrl) {
+        $.ajax({
+          url: callUrl,
+          success: function(data){
+            if (data != null) {
+                $(element).find('.dashboard-list-item:gt(0)').remove();
+                var template  = $(element).find('.dashboard-list-item:first');
+                for (var i = 0; i < data.length; i++) {
+                    var item = $(template).clone();
+                    var tweet = data[i];
+                    $(item).attr('data-tweet-id', tweet.id_str);
+                    $(item).find('.user-profile-link').attr('data-user-id', tweet.user.id_str);
+                    $(item).find('img').attr('src', tweet.user.profile_image_url);
+                    $(item).find('img').attr('alt', tweet.user.screen_name);
+                    $(item).find('.tweet-screen-name').text('@' + tweet.user.screen_name);
+                    $(item).find('.tweet-screen-name').attr('title', tweet.user.screen_name );
+                    $(item).find('.tweet-screen-name').attr('href', '/user?id_str=' + tweet.user.id_str );
+                    $(item).find('.tweet-full-name').text(tweet.user.full_name);
+                    $(item).find('.tweet-text').removeClass('pretty-link');
+                    $(item).find('.tweet-text').text(tweet.text);
+                    $(element).find('.dashboard-list-item:last').after($(item));
+                }
+                $(element).find('.dashboard-list-item:first').remove();
+                initDashboard();
+                $(element).find('.dashboard-list-item').fadeIn('slow');
+            }
+          }
+        });
+    }
+    
+    function recentComments(element, callUrl) {
+        $.ajax({
+          url: callUrl,
+          success: function(data){
+            if (data != null) {
+                $(element).find('.dashboard-list-item:gt(0)').remove();
+                var template  = $(element).find('.dashboard-list-item:first');
+                for (var i = 0; i < data.length; i++) {
+                    var item = $(template).clone();
+                    var comment = data[i];
+                    $(item).attr('data-tweet-id', comment.tweet.id_str);
+                    $(item).find('.user-profile-link').attr('data-user-id', comment.user.id_str);
+                    $(item).find('img').attr('src', comment.user.profile_image_url);
+                    $(item).find('img').attr('alt', comment.user.screen_name);
+                    $(item).find('.tweet-screen-name').text('@' + comment.user.screen_name);
+                    $(item).find('.tweet-screen-name').attr('title', comment.user.screen_name );
+                    $(item).find('.tweet-screen-name').attr('href', '/user?id_str=' + comment.user.id_str );
+                    $(item).find('.tweet-full-name').text(comment.user.full_name);
+                    $(item).find('.tweet-text').removeClass('pretty-link');
+                    $(item).find('.tweet-text').text(comment.content);
+                    $(element).find('.dashboard-list-item:last').after($(item));
+                }
+                $(element).find('.dashboard-list-item:first').remove();
+                initDashboard();
+                $(element).find('.dashboard-list-item').fadeIn('slow');
+            }
+          }
+        });
+    }
+    
+    jQuery(document).ready(function(){
+        initDashboard();
+        serviceCalls();
+    });
+
+</script>

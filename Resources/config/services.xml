@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="bestbadtweets.like.twig.extension.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Extension\LikeTwigExtension</parameter>
+        <parameter key="bestbadtweets.admin.user.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Admin\UserAdmin</parameter>
+        <parameter key="bestbadtweets.admin.group.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Admin\GroupAdmin</parameter>
+        <parameter key="bestbadtweets.twitter.user.provider.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Security\User\Provider\TwitterProvider</parameter>
+        <parameter key="bestbadtweets.twitter.logout.handler.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Security\Logout\TwitterLogoutHandler</parameter>
+        <parameter key="bestbadtweets.authentication.provider.class">FOS\TwitterBundle\Security\Authentication\Provider\TwitterProvider</parameter>
+        <parameter key="bestbadtweets.authentication.success.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Security\Authentication\AjaxSuccessHandler</parameter>
+        <parameter key="bestbadtweets.authentication.failure.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Security\Authentication\AjaxFailureHandler</parameter>
+        <parameter key="bestbadtweets.twitter.api.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Twitter\Api</parameter>
+        <parameter key="bestbadtweets.collector.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Collector</parameter>
+        <parameter key="bestbadtweets.favorites.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Favorites</parameter>
+        <parameter key="bestbadtweets.tweets.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Tweets</parameter>
+        <parameter key="bestbadtweets.votes.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Votes</parameter>
+        <parameter key="bestbadtweets.tweeters.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Tweeters</parameter>
+        <parameter key="bestbadtweets.comments.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Comments</parameter>
+        <parameter key="bestbadtweets.suggestions.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Suggestions</parameter>
+        <parameter key="bestbadtweets.entity_id.type.class">Jessegreathouse\Bundle\BestbadtweetsBundle\Form\EntityIdType</parameter>
+    </parameters>
+
+    <services>
+        <service id="bestbadtweets.suggestions" class="%bestbadtweets.suggestions.class%" >
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="logger" />
+        </service>
+        <service id="suggestions" alias="bestbadtweets.suggestions" />
+        <service id="bestbadtweets.comments" class="%bestbadtweets.comments.class%" >
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="logger" />
+        </service>
+        <service id="comments" alias="bestbadtweets.comments" />
+        <service id="bestbadtweets.tweeters" class="%bestbadtweets.tweeters.class%" >
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="logger" />
+        </service>
+        <service id="tweeters" alias="bestbadtweets.tweeters" />
+        <service id="bestbadtweets.votes" class="%bestbadtweets.votes.class%" >
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="logger" />
+        </service>
+        <service id="votes" alias="bestbadtweets.votes" />
+        <service id="bestbadtweets.tweets" class="%bestbadtweets.tweets.class%" >
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="logger" />
+        </service>
+        <service id="tweets" alias="bestbadtweets.tweets" />
+        <service id="bestbadtweets.favorites" class="%bestbadtweets.favorites.class%" >
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="logger" />
+        </service>
+        <service id="favorites" alias="bestbadtweets.favorites" />
+        <service id="bestbadtweets.collector" class="%bestbadtweets.collector.class%" >
+            <argument type="service" id="bestbadtweets.twitter.api" />
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="logger" />
+        </service>
+        <service id="bestbadtweets.twitter.api" class="%bestbadtweets.twitter.api.class%" >
+            <argument>%bestbadtweets_twitter_consumer_key%</argument>
+            <argument>%bestbadtweets_twitter_consumer_secret%</argument>
+            <argument>%bestbadtweets_access_token%</argument>
+            <argument>%bestbadtweets_access_token_secret%</argument>
+        </service>
+        <service id="bestbadtwitter" alias="bestbadtweets.twitter.api" />
+        <service id="bestbadtweets.authentication.success" class="%bestbadtweets.authentication.success.class%" />
+        <service id="bestbadtweets.authentication.failure" class="%bestbadtweets.authentication.failure.class%" />
+        <service id="bestbadtweets.twitter.user.provider" class="%bestbadtweets.twitter.user.provider.class%" >
+            <argument type="service" id="fos_twitter.api" />
+            <argument type="service" id="fos_user.user_manager" />
+            <argument type="service" id="validator" />
+            <argument type="service" id="bestbadtweets.tweeters" />
+        </service>
+        <service id="bestbadtweets.twitter.auth" class="%bestbadtweets.authentication.provider.class%" >
+            <argument type="service" id="fos_twitter.service"/>
+            <argument type="service" id="service_container"/>
+            <argument type="service" id="bestbadtweets.twitter.user.provider"/>
+            <argument type="service" id="security.user_checker"/>
+        </service>
+        <service id="bestbadtweets.twitter.logout.handler" class="%bestbadtweets.twitter.logout.handler.class%" public="false">
+            <argument type="service" id="fos_twitter.api" />
+        </service>
+        <service id="security.user.provider.concrete.bestbadtweets.twitter.auth" alias="bestbadtweets.twitter.auth" />
+        <service id="security.user.provider.concrete.bestbadtweets.twitter.user.provider" alias="bestbadtweets.twitter.user.provider" />
+        <service id="bestbadtweets.admin.user" class="%bestbadtweets.admin.group.class%" >
+            <tag name="sonata.admin" manager_type="orm" group="bestbadtweets" label="User"/>
+            <argument />
+            <argument>Jessegreathouse\Bundle\BestbadtweetsBundle\Entity\User</argument>
+            <argument />
+        </service>
+        <service id="bestbadtweets.admin.group" class="%bestbadtweets.admin.group.class%" >
+            <tag name="sonata.admin" manager_type="orm" group="bestbadtweets" label="Group"/>
+            <argument />
+            <argument>Jessegreathouse\Bundle\BestbadtweetsBundle\Entity\Group</argument>
+            <argument />
+        </service>
+        <service id="bestbadtweets.like.twig.extension" class="%bestbadtweets.like.twig.extension.class%" >
+            <tag name="twig.extension" />
+        </service>
+        <service id="bestbadtweets.entity_id.type" class="%bestbadtweets.entity_id.type.class%" >
+            <argument type="service" id="doctrine" />
+            <tag name="form.type" alias="entity_id" />
+        </service>
+    </services>
+
+</container>

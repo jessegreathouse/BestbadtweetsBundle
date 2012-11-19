@@ -1,0 +1,115 @@
+{% extends app.request.isXmlHttpRequest() ? 'BestbadtweetsBundle::ajax.html.twig' : 'BestbadtweetsBundle:Tweet:layout.html.twig' %}
+{% block title %} bestbadtweets | {{ tweet.text }} {% endblock title %}
+{% block details %}
+{% include "BestbadtweetsBundle:Tweet:media.html.twig" %}
+{% if app.request.isXmlHttpRequest() %}
+<div class="inner-pane active">
+  <div class="pane-toolbar pane-built-in">
+    <a href="#" class="pane-close toolbar-control">close <span>×</span></a>
+    <br style="clear: both;">
+  </div>
+  <div class="pane-components" style="height: 481px; " >
+    <div class="pane-components-inner tweet-components">
+{% endif %}
+        {% if suggestion and is_granted('ROLE_ADMIN') %}
+        <div class="component">
+            <div id="tweet-approval">
+                <button data-suggestion-id="{{ suggestion.id }}" class="approval-button minimal-indent">
+                    Approve this Tweet
+                </button>
+                <div class="approval-message" style="display:none" ></div>            
+            </div>
+        </div>
+        {% endif %}
+        <div class="component">
+            <div class="conversation">
+                <div data-related-annotations="{{ tweet.user.screen_name }}" data-related-group-name="TweetsWithConversation" data-related-impression-id="1312756169125-44227618-{{ tweet.id_str }}" class="related-tweets"></div>
+                <div data-screen-name="{{ tweet.user.screen_name }}" data-tweet-id="{{ tweet.id_str }}" class="tweet {% if app.request.isXmlHttpRequest() %} details-pane-tweet {% else %} js-actionable-tweet permalink-tweet {% endif %} ">
+                    <div class="tweet-dogear "></div>
+                    <div class="tweet-row">
+                        <div class="tweet-user-block">
+                            <a href="/user?id_str={{ tweet.user.id_str }}" ><img data-user-id="{{ tweet.user.id_str }}" class="tweet-user-block-image user-profile-link" alt="{{ tweet.user.name }}" src="{{ tweet.user.profile_image_url }}"></a>
+                            <div class="tweet-user-block-name">
+                                <a title="{{ tweet.user.name }}" href="/user?id_str={{ tweet.user.id_str }}" data-user-id="{{ tweet.user.id_str }}" class="tweet-user-block-screen-name user-profile-link">@{{ tweet.user.screen_name }}</a>
+                                <span class="tweet-user-block-full-name">{{ tweet.user.name }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tweet-row">
+                        <div class="tweet-text tweet-text-large">{{ tweet.text }}</div>
+                    </div>
+                    {% if block('media') %}
+                        {{ block('media') }}
+                    {% endif %}
+                    <div class="tweet-row">
+                        <a title="{{ tweet.created_at }}" class="tweet-timestamp" href="/tweet?id_str={{ tweet.id_str }}">
+                            <span data-long-form="true" data-time="{{ tweet.id_str }}" class="_old-timestamp">
+                                <abbr class="timeago" title="{{ tweet.created_at|date("c") }}" ></abbr>
+                            </span>
+                        </a>
+                        {% if suggestedBy != null %}
+                        <span class="tweet-source">suggested by <a title="{{ suggestedBy.name }}" href="/user?id_str={{ suggestedBy.id_str }}" data-user-id="{{ suggestedBy.id_str }}" class="tweet-user-block-screen-name user-profile-link">@{{ suggestedBy.screen_name }}</a></span>
+                        {% else %}
+                        <span class="tweet-source">favorited by bestbadtweets.com</span>
+                        {% endif %}
+                        <span data-tweet-id="{{ tweet.id_str }}" class="tweet-actions">
+                            {% include "BestbadtweetsBundle:Vote:stars.html.twig" %}
+                    </div>
+                    <div class="tweet-row">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="component">
+            <div id="tweet-comments">
+            </div>
+        </div>
+{% if app.request.isXmlHttpRequest() %}
+    </div>
+</div>
+{% endif %}
+<script>
+    
+    function initBinds() {
+        $('.tweet-text').not('.pretty-link').each(function(i, item) { 
+            $(item).html(replaceURLWithHTMLLinks($(item).html()));
+            $(item).html(addLinkToHash($(item).html()));
+            $(item).html(addLinkToAmp($(item).html()));
+            $(item).addClass('pretty-link');
+        });
+
+        {% if suggestion and is_granted('ROLE_ADMIN') %}
+        $('.approval-button').click(function() { 
+            $.ajax({
+              url: "{{ path('approve', { 'id': suggestion.id }) }}",
+              success: function(data){
+                if (data.status == 'success') {
+                    $('.approval-button').attr('disabled', 'disabled');
+                    $('.approval-button').text(data.message);
+                } else {
+                    $('.approval-message').css('display', 'block');
+                    $('.approval-message').text(data.message);
+                }
+              }
+            });
+        });
+        {% endif %}
+    }
+
+    resizeDashboard();
+    $("abbr.timeago").each(function(i, item) {
+        var tweetDate = new Date($(item).attr('title'));
+        if (tweetDate.addDays(2) > Date.today()) {
+            $(item).timeago();
+        } else {
+            var formattedDate = new Date($(item).attr('title'));
+            $(item).text(formattedDate.toString('d MMM'));
+        }
+    });
+    
+    jQuery(document).ready(function(){
+        initBinds()
+        $('#tweet-comments').load('/comments?id_str=' + '{{ tweet.id_str }}');
+    });
+</script>
+{% endblock %}
