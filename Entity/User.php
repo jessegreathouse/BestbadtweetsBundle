@@ -34,9 +34,25 @@ class User extends BaseUser
             $this->id = $id;
             return $this;
         }
+
+    /** 
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $twitter_username;
+
+        public function getTwitterUsername()
+        {
+            return $this->twitter_username;
+        }
+    
+        public function setTwitterUsername($twitterUsername)
+        {
+            $this->twitter_username = $twitterUsername;
+            return $this;
+        }
     
     /**
-     * @ORM\Column(type="string", nullable="true")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $twitterId;
 
@@ -92,6 +108,7 @@ class User extends BaseUser
                 $tweeter = $twitterUser->getTwitterUser();
                 $this->setTwitterId($tweeter->id_str);
                 $this->setUsername($tweeter->id_str);
+                $this->setTwitterUsername($twitterUser->screen_name);
                 $this->setEmail('@' . $tweeter->screen_name);
                 $this->addRole('ROLE_TWITTER');
 
@@ -106,6 +123,7 @@ class User extends BaseUser
 
             if (isset($twitterUser->screen_name)) {
                 $this->setEmail('@' . $twitterUser->screen_name);
+                $this->setTwitterUsername($twitterUser->screen_name);
             }
 
             $t = new TwitterUser;

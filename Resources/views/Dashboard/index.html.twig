@@ -121,9 +121,9 @@
             
         $('.footer.inline-list a').click(function() {
             var hidden = $('.details-pane:hidden');
-	        var showOrHide = false;
+            var showOrHide = false;
 
-	        if ( hidden.length > 0 ) {
+            if ( hidden.length > 0 ) {
               showOrHide = true;
             }
             $('.details-pane').load($(this).attr('href'), {}, function() { $('.details-pane').toggle(showOrHide); });

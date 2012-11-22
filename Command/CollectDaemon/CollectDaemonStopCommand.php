@@ -2,7 +2,7 @@
 
 namespace Jessegreathouse\Bundle\BestbadtweetsBundle\Command\CollectDaemon;
 
-require_once(realpath(dirname(__FILE__)) . '/../../../../../../vendor/twitteroauth/twitteroauth/twitteroauth.php');
+require_once(realpath(dirname(__FILE__)) . '/../../../../../../../../vendor/kertz/twitteroauth/twitteroauth/twitteroauth.php');
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

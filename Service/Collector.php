@@ -208,14 +208,17 @@ class Collector
                 if((is_object($mention)) && (NULL != $mention->in_reply_to_status_id_str)) {
                     if (!$t = $this->repo['tweets']->findOneBy(array('tweetId' => $mention->in_reply_to_status_id_str))) {
                         $tweet = $this->getTweet($mention->in_reply_to_status_id_str);
-                        if (!$u = $this->repo['users']->findOneBy(array('twitterUserId' => $tweet->user->id_str))) {
-                            $u = $this->addUser($tweet->user);
+                        if (property_exists($tweet , 'user')) {
+                            if (!$u = $this->repo['users']->findOneBy(array('twitterUserId' => $tweet->user->id_str))) {
+                                $u = $this->addUser($tweet->user);
+                            } else {
+                                $this->updateUser($tweet->user, $u);
+                            }
+                            
+                            $t = $this->addTweet($tweet, $u);
                         } else {
-                            $this->updateUser($tweet->user, $u);
+                            continue;
                         }
-                        
-                        $t = $this->addTweet($tweet, $u);
-                        
                     }
                     $suggestions =  $this->repo['suggestions']->findBy(array('tweetId' => $t->getTweetId()));
                     if (count($suggestions) < 1) {
