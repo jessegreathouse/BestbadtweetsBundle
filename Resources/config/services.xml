@@ -57,6 +57,7 @@
         <service id="favorites" alias="bestbadtweets.favorites" />
         <service id="bestbadtweets.collector" class="%bestbadtweets.collector.class%" >
             <argument type="service" id="bestbadtweets.twitter.api" />
+            <argument type="service" id="yfrog" />
             <argument type="service" id="doctrine.orm.entity_manager" />
             <argument type="service" id="logger" />
         </service>

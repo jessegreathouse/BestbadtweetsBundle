@@ -7,6 +7,9 @@ use Jessegreathouse\Bundle\BestbadtweetsBundle\Entity\Favorite;
 use Jessegreathouse\Bundle\BestbadtweetsBundle\Entity\TwitterUser;
 use Jessegreathouse\Bundle\BestbadtweetsBundle\Entity\Suggestion;
 use Jessegreathouse\Bundle\BestbadtweetsBundle\Service\Twitter\Api as Twitter;
+use Jessegreathouse\Yfrog\YfrogClient;
+use Jessegreathouse\Yfrog\YfrogRequest;
+
 use Symfony\Bridge\Monolog\Logger as Monolog;
 use Doctrine\ORM\EntityManager;
 
@@ -16,6 +19,11 @@ class Collector
      * @var $twitter Twitter
      */
     private $twitter;
+
+    /**
+     * @var $yfrog YfrogClient
+     */
+    private $yfrog;
     
     /**
      * @var $em  EntityManager
@@ -33,9 +41,10 @@ class Collector
     private $repo;
      
      
-    public function __construct(Twitter $twitter, EntityManager $em, Monolog $logger)
+    public function __construct(Twitter $twitter, YfrogClient $yfrog, EntityManager $em, Monolog $logger)
     {
         $this->twitter = $twitter;
+        $this->yfrog = $yfrog;
         $this->em = $em;
         $this->logger = $logger;
         
@@ -103,6 +112,7 @@ class Collector
     public function addTweet($tweet, $user)
     {
         $t = new Tweet;
+        $tweet->text = $this->saveMedia($tweet->text);
         $t->setTweet($tweet);
         $t->setTwitterUser($user);
         $this->em->persist($t);
@@ -110,6 +120,45 @@ class Collector
         $this->logger->info('Collector added new tweet by:"' . $tweet->user->screen_name 
                             . '" message:"' . $tweet->text . '"');
         return $t;
+    }
+
+    public function saveMedia($text)
+    {
+        $matches = array();
+
+        $text = preg_replace_callback(
+            "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/",
+            array(&$this, 'saveMediaBridge'),
+            $text
+        );
+
+        return $text;
+    }
+
+    public function saveMediaBridge(array $matches)
+    {
+        return $this->swapMedia($matches[0]);
+    }
+
+    public function swapMedia($url)
+    {
+        $imageUrl = false;
+        $checkImg = getimagesize($url);
+
+        if (is_array($checkImg)) {
+            $imageUrl = $url;
+        } else {
+            //
+        }
+
+        if (false !== $imageUrl) {
+            $yfrogRequest = new YfrogRequest();
+            $yfrogRequest->setUrl($imageUrl);
+            $yfrog = $this->yfrog->transload($yfrogRequest);
+            $url = $yfrog->getMediaUrl();
+        }
+
+        return $url;
     }
     
     public function addUser($user)
