@@ -46,7 +46,7 @@
                                     <div class="tweet-text">{{ tweet.text }}</div>
                                 </div>
                                 <div class="tweet-row">
-                                    <a title="{{ tweet.created_at }}" class="tweet-timestamp" href="/#!/{{ tweet.user.screen_name }}/status/{{ tweet.id_str }}">
+                                    <a data-tweet-id="{{ tweet.id_str }}" title="{{ tweet.created_at }}" class="tweet-timestamp" href="#">
                                         <span data-long-form="true" data-time="{{ tweet.id_str }}" class="_old-timestamp">
                                             <abbr class="timeago" title="{{ tweet.created_at|date("c") }}" ></abbr>
                                         </span>

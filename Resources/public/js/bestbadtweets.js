@@ -89,35 +89,35 @@ jQuery(document).ready(function(){
         return false;
     });
 
-	$('.stream-item .tweet, .stream-item .more, .dashboard-list-item, .dashboard-stream-item .tweet').live('click', function() {
-	    var hidden = $('.details-pane:hidden');
-	    var id_str = $(this).attr('data-tweet-id');
-	    var showOrHide = false;
+    $('.stream-item .tweet, .stream-item .more, .dashboard-list-item, .dashboard-stream-item .tweet, .tweet-timestamp').live('click', function() {
+        var hidden = $('.details-pane:hidden');
+        var id_str = $(this).attr('data-tweet-id');
+        var showOrHide = false;
         if ($('.details-pane').length == 0) {
             window.location = "/tweet?id_str=" + id_str;
             return false;
         }
-	    if ( hidden.length > 0 || ($('.details-pane-tweet').attr('data-tweet-id') != id_str)) {
+        if ( hidden.length > 0 || ($('.details-pane-tweet').attr('data-tweet-id') != id_str)) {
           showOrHide = true;
         }
         $('.details-pane').load("/tweet?id_str=" + id_str, {}, loadTweet(showOrHide));
-	});
-	
-	$('.stream-item .user-content-medium, .user-profile-link').live('click', function() {
-	    var hidden = $('.details-pane:hidden');
-	    var id_str = $(this).attr('data-user-id');
-	    var showOrHide = false;
+    });
+    
+    $('.stream-item .user-content-medium, .user-profile-link').live('click', function() {
+        var hidden = $('.details-pane:hidden');
+        var id_str = $(this).attr('data-user-id');
+        var showOrHide = false;
         if ($('.details-pane').length == 0) {
             window.location = "/user?id_str=" + id_str;
             return false;
         }
-	    if ( hidden.length > 0 || ($('.profile-pane').attr('data-user-id') != id_str)) {
+        if ( hidden.length > 0 || ($('.profile-pane').attr('data-user-id') != id_str)) {
           showOrHide = true;
         }
         $('.details-pane').load("/user?id_str=" + id_str, {}, loadUser(showOrHide));
         return false;
-	});
-	
+    });
+    
     $("abbr.timeago").each(function(i, item) {
         var tweetDate = new Date($(item).attr('title'));
         if (tweetDate.addDays(2) > Date.today()) {
