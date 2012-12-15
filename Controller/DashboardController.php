@@ -16,7 +16,6 @@ class DashboardController extends Controller
     
     public function systemMessageAction($_format)
     {
-        //$screenName = $this->container->getParameter('bestbadtweets_twitter_login');
         $tweets = $this->get('tweets')->findByScreenName('bestbadtweets', 1, 0, true);
         if (!$tweets) {
             $tweet = null;
